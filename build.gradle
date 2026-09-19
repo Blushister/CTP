@@ -1,0 +1,125 @@
+plugins {
+    id 'net.neoforged.moddev' version '2.0.80'
+}
+
+repositories {
+    maven { url = 'https://maven.createmod.net' }
+    maven { url = 'https://maven.ithundxr.dev/snapshots' }
+    maven { url = 'https://maven.twelveiterations.com/repository/maven-public/' }
+}
+
+// FTB Chunks exposes the claim/protection API this mod calls directly, so its jar
+// must be on the compile classpath. FTB does not publish 1.21.1 artifacts to a
+// reachable Maven repository, hence the local-file resolution.
+def ftbDir = file(ftb_jar_dir)
+def ftbJar = { String name ->
+    def f = new File(ftbDir, name)
+    if (!f.exists()) {
+        throw new GradleException(
+            "Missing FTB jar: ${f.absolutePath}\n" +
+            "Put the FTB Chunks, FTB Teams and FTB Library jars in libs/, or set ftb_jar_dir " +
+            "(and ftb_*_jar if the versions differ) - see README.md."
+        )
+    }
+    return files(f)
+}
+
+dependencies {
+    // Compile-only: none of these are bundled into the Arcadia CTP jar.
+    compileOnly ftbJar(ftb_chunks_jar)
+    compileOnly ftbJar(ftb_teams_jar)
+    compileOnly ftbJar(ftb_library_jar)
+
+    // The contraption guards wrap calls whose signatures mention Create's own types
+    // (MovementBehaviour, MovementContext) and register a BlockMovementChecks callback,
+    // so Create is needed at compile time. It stays out of the jar, and the mixins are
+    // still @Pseudo + plugin-gated so an absent or changed Create disables them.
+    compileOnly("com.simibubi.create:create-${minecraft_version}:${create_version}-281:slim") {
+        transitive = false
+    }
+    runtimeOnly("com.simibubi.create:create-${minecraft_version}:${create_version}-281:slim") {
+        transitive = false
+    }
+    // Waystones, for the "visible to team" patch. Optional at runtime: the mixin plugin
+    // skips that patch when the mod is absent, so the jar stays usable without it.
+    compileOnly("net.blay09.mods:waystones-neoforge:${waystones_version}") {
+        transitive = false
+    }
+
+    runtimeOnly('com.tterrag.registrate:Registrate:MC1.21-1.3.0+67')
+    runtimeOnly("net.createmod.ponder:ponder-neoforge:1.0.82+mc${minecraft_version}")
+    runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:1.0.6")
+    runtimeOnly("dev.engine-room.vanillin:vanillin-neoforge-${minecraft_version}:1.1.3-41")
+}
+
+version = "${mod_version}"
+group = "${mod_group}"
+
+base {
+    archivesName = mod_id.replace('_', '-')
+}
+
+neoForge {
+    version = "${neo_version}"
+    runs {
+        server {
+            server()
+            gameDirectory = file('run/server')
+            programArgument '--nogui'
+        }
+        // Two clients, because the whole point is what a player outside the team can do:
+        // one owns the claim, the other tries things on it. Names are fixed so the ops
+        // file below can grant permission level 2 to the owner and nothing to the intruder.
+        client {
+            client()
+            gameDirectory = file('run/client')
+            programArgument '--username'
+            programArgument 'Owner_Dev'
+        }
+        client2 {
+            client()
+            gameDirectory = file('run/client2')
+            programArgument '--username'
+            programArgument 'Intruder_Dev'
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+tasks.named('processResources') {
+    def replaceProperties = [
+        mod_id                : mod_id,
+        mod_name              : mod_name,
+        mod_version           : mod_version,
+        mod_license           : mod_license,
+        mod_authors           : mod_authors,
+        mod_description       : mod_description,
+        mod_repo_url          : mod_repo_url,
+        mod_issue_tracker_url : mod_issue_tracker_url,
+        neo_version           : neo_version,
+        create_version        : create_version,
+    ]
+    inputs.properties(replaceProperties)
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand(replaceProperties)
+    }
+}
+
+tasks.named('jar') {
+    // LGPL-3.0 builds on the GPL-3.0, so both texts travel with every distributed jar.
+    from('LICENSE') { rename { 'LICENSE_arcadia_ctp' } }
+    from('COPYING') { rename { 'COPYING_arcadia_ctp' } }
+    manifest {
+        attributes([
+            'MixinConfigs': 'arcadia_ctp.mixins.json'
+        ])
+    }
+}

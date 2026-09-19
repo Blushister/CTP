@@ -1,0 +1,18 @@
+{
+  "_comment": "Blocks a player may right-click inside someone else's claim, subject to the 'claimInteraction' policy. Shipped with the waystone blocks because FTB Chunks means to whitelist them and misses: it asks for #waystones:waystone and #waystones:sharestone, singular, while Waystones ships them plural. Both its entries are 'required: false', so they resolve to nothing without a warning. Extend this tag from a datapack to cover more blocks.",
+  "replace": false,
+  "values": [
+    {
+      "id": "#waystones:waystones",
+      "required": false
+    },
+    {
+      "id": "#waystones:sharestones",
+      "required": false
+    },
+    {
+      "id": "#waystones:portstones",
+      "required": false
+    }
+  ]
+}

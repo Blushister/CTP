@@ -1,0 +1,11 @@
+# Normalise line endings in the repository, whatever the contributor's platform.
+* text=auto eol=lf
+
+# Windows scripts must keep CRLF to run under cmd.exe.
+*.bat text eol=crlf
+
+# The POSIX wrapper must keep LF or it fails with "bad interpreter" on Linux/macOS.
+gradlew text eol=lf
+
+*.jar binary
+*.png binary

@@ -1,0 +1,7 @@
+{
+  "_comment": "Opens the door: FTB Chunks tests this tag before it looks at the claim's team and returns ALLOW straight away. Who actually gets through is then decided by Arcadia CTP's 'claimInteraction' policy, which can close it again for visitors, allies or everyone. The list itself lives in #arcadia_ctp:claim_interact_whitelist so both ends read the same one.",
+  "replace": false,
+  "values": [
+    "#arcadia_ctp:claim_interact_whitelist"
+  ]
+}

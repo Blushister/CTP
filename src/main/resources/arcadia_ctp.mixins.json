@@ -1,0 +1,19 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "fr.arcadia.ctp.mixin",
+  "plugin": "fr.arcadia.ctp.bootstrap.CTPMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MixinBlockEntityConfigurationPacket",
+    "MixinAbstractContraptionEntity",
+    "MixinContraption",
+    "MixinPortableStorageInterfaceMovement",
+    "MixinWaystoneIndexManager"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

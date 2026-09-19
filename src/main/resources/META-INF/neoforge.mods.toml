@@ -1,0 +1,60 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "${mod_license}"
+
+[[mixins]]
+    config = "arcadia_ctp.mixins.json"
+
+[[mods]]
+    modId = "${mod_id}"
+    version = "${mod_version}"
+    displayName = "${mod_name}"
+    authors = "${mod_authors}"
+    displayURL = "${mod_repo_url}"
+    issueTrackerURL = "${mod_issue_tracker_url}"
+    description = "${mod_description}"
+
+[[dependencies.${mod_id}]]
+    modId = "neoforge"
+    type = "required"
+    versionRange = "[${neo_version},)"
+    ordering = "NONE"
+    side = "BOTH"
+
+# Optional: the Create protections are skipped when it is absent (the mixins by the
+# plugin, the assembly check by ModPresence), and the Waystones side works on its own.
+[[dependencies.${mod_id}]]
+    modId = "create"
+    type = "optional"
+    versionRange = "[${create_version},)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+# The claim data every policy other than ALLOW/DENY reads lives in FTB Chunks.
+[[dependencies.${mod_id}]]
+    modId = "ftbchunks"
+    type = "required"
+    versionRange = "[2101.1.14,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "ftbteams"
+    type = "required"
+    versionRange = "[2101.1.10,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+# Waystones resolves "Visible to Team" through the vanilla scoreboard; the patch for
+# that is skipped by the mixin plugin when the mod is absent, hence optional.
+# Deliberately wide: an optional dependency's range is still ENFORCED when the mod is
+# present, so [21.1.41,) refused to launch next to the pack's own 21.1.37. TEAM visibility
+# is missing from older builds (absent in 21.1.15, present in 21.1.36), but the mixin
+# plugin already checks Waystones' bytecode and disables that one patch there; the claim
+# interaction side works on every 21.1.x.
+[[dependencies.${mod_id}]]
+    modId = "waystones"
+    type = "optional"
+    versionRange = "[21.1,)"
+    ordering = "AFTER"
+    side = "BOTH"

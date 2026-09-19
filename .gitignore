@@ -1,0 +1,35 @@
+# Gradle
+.gradle/
+build/
+out/
+bin/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Third-party mod jars used to compile and run. FTB Chunks / Teams / Library are
+# All Rights Reserved: they are resolved locally and must never be committed.
+libs/*
+!libs/.gitkeep
+
+# Dev runs: worlds, logs, crash reports, configs, and the mod jars dropped into
+# run/*/mods for testing (FTB, Waystones, Balm, Architectury).
+run/
+runs/
+.mixin.out/
+logs/
+crash-reports/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
